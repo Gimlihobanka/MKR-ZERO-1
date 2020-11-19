@@ -1,5 +1,23 @@
 #include <Arduino.h>
 
+// RFM69HCW Example Sketch
+// Send serial input characters from one RFM69 node to another
+// Based on RFM69 library sample code by Felix Rusu
+// http://LowPowerLab.com/contact
+// Modified for RFM69HCW by Mike Grusin, 4/16
+
+// This sketch will show you the basics of using an
+// RFM69HCW radio module. SparkFun's part numbers are:
+// 915MHz: https://www.sparkfun.com/products/12775
+// 434MHz: https://www.sparkfun.com/products/12823
+
+// See the hook-up guide for wiring instructions:
+// https://learn.sparkfun.com/tutorials/rfm69hcw-hookup-guide
+
+// Uses the RFM69 library by Felix Rusu, LowPowerLab.com
+// Original library: https://www.github.com/lowpowerlab/rfm69
+// SparkFun repository: https://github.com/sparkfun/RFM69HCW_Breakout
+
 // Include the RFM69 and SPI libraries:
 
 #include <RFM69.h>
@@ -13,9 +31,8 @@
 
 // RFM69 frequency, uncomment the frequency of your module:
 
-#define FREQUENCY   RF69_433MHZ
-//#define FREQUENCY     RF69_915MHZ
-//#define FREQUENCY     RF69_868MHZ
+//#define FREQUENCY   RF69_433MHZ
+#define FREQUENCY     RF69_868MHZ
 
 // AES encryption (or not):
 
@@ -31,8 +48,6 @@
 #define LED           0 // LED positive pin
 #define GND           1 // LED ground pin
 
-
-
 // Create a library object for our RFM69HCW module:
 
 RFM69 radio;
@@ -40,13 +55,11 @@ RFM69 radio;
 void setup()
 {
   // Open a serial port so we can send keystrokes to the module:
-  pinMode(2, OUTPUT);
-
-  digitalWrite(2, HIGH);
-  delay(200);
-  digitalWrite(2, LOW);
 
   Serial.begin(9600);
+
+  delay(1000);
+
   Serial.print("Node ");
   Serial.print(MYNODEID,DEC);
   Serial.println(" ready");  
@@ -59,9 +72,13 @@ void setup()
   digitalWrite(GND,LOW);
 
   // Initialize the RFM69HCW:
-  // radio.setCS(10);  //uncomment this if using Pro Micro
-  radio.initialize(FREQUENCY, MYNODEID, NETWORKID);
-  radio.setHighPower(); // Always use this for RFM69HCW
+  // (radio.setCS(10);  //uncomment this if using Pro Micro
+  if (!radio.initialize(FREQUENCY, MYNODEID, NETWORKID)) Serial.println("radio fail");
+  //radio.setHighPower(); // Always use this for RFM69HCW
+
+  Serial.print("X Node ");
+  Serial.print(MYNODEID,DEC);
+  Serial.println(" ready X"); 
 
   // Turn on encryption if desired:
 
@@ -94,7 +111,6 @@ void loop()
 
   if (Serial.available() > 0)
   {
-    digitalWrite(2, HIGH);
     char input = Serial.read();
 
     if (input != '\r') // not a carriage return
@@ -176,4 +192,3 @@ void loop()
     Blink(LED,10);
   }
 }
-
